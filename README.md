@@ -1,3 +1,10 @@
+# MADDED development branch 
+
+This repository is a modifed version of the one found at https://github.com/rucio/rucio
+The changes are done as part of the MADDEN project and currenty contains changes to bin/rucio and 
+lib/rucio/core/oidc.py . The changes allow for calling several servers as well as allowing automatic
+mapping of users from a OIDC provider to a shared identity. 
+
 # Rucio - Scientific Data Management
 
 Rucio is a software framework that provides functionality to organize, manage, and access large volumes of scientific data using customisable policies.
