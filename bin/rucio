@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
+# Prominent Notice!
+# This file has been edited by Matti Jansson from the original 
+# form found at https://github.com/rucio .
+# This edit was done to enable the client to call multiple rucio
+# servers. 
+
+
 # Copyright European Organization for Nuclear Research (CERN) since 2012
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2531,9 +2538,9 @@ if __name__ == '__main__':
         oparser.print_help()
         sys.exit(FAILURE)
 
-    # hosts = ['https://rucio:443', 'https://rucio:443']   
     args = oparser.parse_args(arguments)
     logger = setup_logger(module_name=__name__, logger_name='user', verbose=args.verbose)
+    start_time = time.time()
     hostfile = config_get('client', 'hostfile', raise_exception=False)
     if hostfile:
         file = open(hostfile,'r')
@@ -2553,14 +2560,10 @@ if __name__ == '__main__':
                 #print()
             end_time = time.time()  
         else:
-            start_time = time.time()
             result = args.function(args)
-            end_time = time.time()
     else:
-        start_time = time.time()
         result = args.function(args)
-        end_time = time.time()
-
+    end_time = time.time()
     if args.verbose:
         print("Completed in %-0.4f sec." % (end_time - start_time))
     sys.exit(result)
