@@ -1,3 +1,10 @@
+# Prominent Notice!
+# This file has been edited by Matti Jansson from the original 
+# form found at https://github.com/rucio .
+# This edit was done to enable the server to automatically map
+# users authenticated by a OIDC provider to a single identity. 
+
+
 # Copyright European Organization for Nuclear Research (CERN) since 2012
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -178,7 +185,7 @@ def __get_rucio_oidc_clients(keytimeout: int = 43200) -> tuple[dict, dict]:
         try:
             client_secret = client_secrets[iss]
             issuer = client_secret["issuer"]
-            client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+            client = Client(client_authn_method=CLIENT_AUTHN_METHOD, verify_ssl = False)
             # general parameter discovery about the Identity Provider via issuers URL
             client.provider_config(issuer)
             # storing client specific parameters into the client itself
@@ -192,7 +199,7 @@ def __get_rucio_oidc_clients(keytimeout: int = 43200) -> tuple[dict, dict]:
             # doing the same to store a Rucio Admin client
             # which has client credential flow allowed
             client_secret = client_secrets[iss]["SCIM"]
-            client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+            client = Client(client_authn_method=CLIENT_AUTHN_METHOD, verify_ssl = False)
             client.provider_config(issuer)
             client_reg = RegistrationResponse(**client_secret)
             client.store_registration_info(client_reg)
@@ -458,7 +465,7 @@ def get_auth_oidc(account: str, *, session: "Session", **kwargs) -> str:
                                                    redirect_msg=auth_url,
                                                    expired_at=expired_at,
                                                    refresh_lifetime=refresh_lifetime,
-                                                   ip=ip)
+                                                       ip=ip)
         oauth_session_params.save(session=session)
         # If user selected authentication via web browser, a redirection
         # URL is returned instead of the direct URL pointing to the IdP.
@@ -1454,7 +1461,12 @@ def oidc_identity_string(sub: str, iss: str):
 
     :returns: OIDC identity string "SUB=<usersid>, ISS=https://iam-test.ch/"
     """
-    return 'SUB=' + str(sub) + ', ISS=' + str(iss)
+    iss_with_shared_identity = config_get("oidc", "iss_sharing_identity", False, default=None)
+    if iss_with_shared_identity and iss_with_shared_identity == iss:
+        shared_identity_string = config_get("oidc", "shared_identity_string")
+        return shared_identity_string
+    else:
+        return 'SUB=' + str(sub) + ', ISS=' + str(iss)
 
 
 def token_dictionary(token: models.Token):
