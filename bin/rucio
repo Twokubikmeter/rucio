@@ -2537,7 +2537,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         oparser.print_help()
         sys.exit(FAILURE)
-
+    
     args = oparser.parse_args(arguments)
     logger = setup_logger(module_name=__name__, logger_name='user', verbose=args.verbose)
     start_time = time.time()
@@ -2545,19 +2545,16 @@ if __name__ == '__main__':
     if hostfile:
         file = open(hostfile,'r')
         lines = file.readlines()
-        if args.function.__name__ in [x.strip() for x in lines[0].split(',')]:
+        if arguments[0] in [x.strip() for x in lines[0].split(',')]:
             start_time = time.time()
             for line in lines[1:]:
-                values = line.split(" ")
+                values = line.split(",")
                 host = values[0].strip()
                 config = values[1].strip()
-                #print(host)
-                #print(config)
-                args.hostname = host
                 clean_cached_config()
                 os.environ['RUCIO_CONFIG'] = config
+                print('Result from {}.'.format(host))
                 result = args.function(args)
-                #print()
             end_time = time.time()  
         else:
             result = args.function(args)
