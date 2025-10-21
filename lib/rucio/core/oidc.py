@@ -1414,7 +1414,8 @@ def validate_jwt(json_web_token: str, *, session: "Session") -> dict[str, Any]:
         token_dict: Optional[dict[str, Any]] = __get_rucio_jwt_dict(json_web_token, session=session)
         if not token_dict:
             raise CannotAuthenticate(traceback.format_exc())
-        issuer = token_dict['identity'].split(", ")[1].split("=")[1]
+        token_payload = __get_keyvalues_from_claims(json_web_token, ['iss'])
+        issuer = token_payload['iss']
         oidc_client = OIDC_CLIENTS[issuer]
         issuer_keys = oidc_client.keyjar.get_issuer_keys(issuer)
         JWS().verify_compact(json_web_token, issuer_keys)
